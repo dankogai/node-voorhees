@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * $Id: voorhees.js,v 0.1 2013/04/02 13:50:50 dankogai Exp dankogai $
+ * $Id: voorhees.js,v 0.2 2013/04/03 07:11:17 dankogai Exp dankogai $
  *
  *  (c) 2013 Dan Kogai
  *
@@ -17,7 +17,11 @@
     function voorhees(data) {
         stdout.write(JSON.stringify(JSON.parse('' + data), null, 2) + '\n')
     }
-    if (matches = argv[2].match(/^(https?):\/\//)) { // fetch https?
+    if (! argv[2]) { // read stdin
+        stdin.resume();
+        stdin.setEncoding("UTF8");
+        stdin.on("data", voorhees);
+    } else  if (matches = argv[2].match(/^(https?):\/\//)) { // fetch https?
         var proto = matches[1], 
         http = require(proto),
         url = require('url'),
@@ -32,15 +36,11 @@
                 voorhees(chunks.join(''))
             });
         });
-    } else if (argv[2]) {  // read local file
+    } else {  // read local file
         var fs = require('fs');
         fs.readFile(argv[2], function (err, data) {
             if (err) throw err;
             voorhees(data);
         });
-    } else { // read stdin
-        stdin.resume();
-        stdin.setEncoding("UTF8");
-        stdin.on("data", voorhees);
     }
 })(this);
